@@ -56,6 +56,11 @@
 @code {
     private bool _exporting;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JS.InvokeVoidAsync("worldCupSchedule.formatLocalTimes");
+    }
+
     private async Task ExportBracket()
     {
         _exporting = true;
@@ -101,6 +106,7 @@
         var drawScores = m.HomeScore is int hs && m.AwayScore is int aws && hs == aws;
 
         <div class="ko-match @(m.Winner is not null ? "decided" : "")">
+            <MatchTime Info="@Schedule2026.Get(id)" />
             <div class="ko-head">
                 <span>Match @m.Fixture.MatchNumber</span>
                 @if (m.Winner is not null)
