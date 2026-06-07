@@ -1,0 +1,17 @@
+@using WorldCupModeler.Models
+
+@if (Info is not null)
+{
+    <div class="match-when-row">
+        <span class="match-when" data-utc="@Info.KickoffUtc.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ")">@FallbackText</span>
+        <span class="match-venue">@Info.Stadium, @Info.City</span>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public MatchInfo? Info { get; set; }
+
+    // Shown until schedule.js localizes the time (e.g. before first JS pass / no JS).
+    private string FallbackText =>
+        Info is null ? "" : Info.KickoffUtc.UtcDateTime.ToString("ddd, d MMM yyyy, HH:mm 'UTC'");
+}
