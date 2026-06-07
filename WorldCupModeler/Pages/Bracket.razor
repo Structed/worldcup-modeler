@@ -1,0 +1,162 @@
+@page "/bracket"
+@inherits TournamentPage
+@inject IJSRuntime JS
+
+<PageTitle>Knockout Bracket — World Cup 2026 Modeler</PageTitle>
+
+<div class="page-header">
+    <h1>Knockout Bracket</h1>
+    <p class="lead">Click the team you think advances. Scores are optional — use them to record results or trigger a penalty shootout on a draw.</p>
+    <div class="page-actions">
+        <button class="btn-export" @onclick="ExportBracket" disabled="@_exporting">
+            @(_exporting ? "Generating…" : "📷 Export bracket as PNG")
+        </button>
+    </div>
+</div>
+
+@{
+    var all = Tournament.GetKnockoutMatches();
+    var champion = Tournament.Champion;
+}
+
+<div id="bracket-capture">
+@if (champion is not null)
+{
+    <div class="champion-banner">
+        <div class="champion-label">🏆 Champion</div>
+        <div class="champion-team"><Flag Code="@champion.Code" /> @champion.Name</div>
+    </div>
+}
+
+<div class="bracket-scroll">
+    <div class="bracket">
+        @foreach (var round in MainRounds)
+        {
+            var matches = all.Where(m => m.Fixture.Round == round).ToList();
+            <div class="round-col">
+                <h3 class="round-title">@RoundName(round) <span class="round-count">@matches.Count(m => m.Winner is not null)/@matches.Count</span></h3>
+                @foreach (var m in matches)
+                {
+                    @RenderMatch(m)
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div class="third-place-playoff">
+    <h3 class="round-title">Third-place play-off</h3>
+    @foreach (var m in all.Where(m => m.Fixture.Round == KnockoutRound.ThirdPlacePlayoff))
+    {
+        @RenderMatch(m)
+    }
+</div>
+</div>
+
+@code {
+    private bool _exporting;
+
+    private async Task ExportBracket()
+    {
+        _exporting = true;
+        try
+        {
+            await JS.InvokeAsync<bool>(
+                "worldCupExport.bracketPng",
+                "#bracket-capture",
+                ".bracket-scroll",
+                "world-cup-2026-bracket.png");
+        }
+        catch
+        {
+            // Export is best-effort; ignore failures so the UI stays responsive.
+        }
+        finally
+        {
+            _exporting = false;
+        }
+    }
+
+    private static readonly KnockoutRound[] MainRounds =
+    {
+        KnockoutRound.RoundOf32, KnockoutRound.RoundOf16, KnockoutRound.QuarterFinal,
+        KnockoutRound.SemiFinal, KnockoutRound.Final
+    };
+
+    private static string RoundName(KnockoutRound r) => r switch
+    {
+        KnockoutRound.RoundOf32 => "Round of 32",
+        KnockoutRound.RoundOf16 => "Round of 16",
+        KnockoutRound.QuarterFinal => "Quarter-finals",
+        KnockoutRound.SemiFinal => "Semi-finals",
+        KnockoutRound.ThirdPlacePlayoff => "Third place",
+        KnockoutRound.Final => "Final",
+        _ => r.ToString()
+    };
+
+    private RenderFragment RenderMatch(ResolvedKnockoutMatch m) => __builder =>
+    {
+        var id = m.Fixture.MatchId;
+        var known = m.BothTeamsKnown;
+        var drawScores = m.HomeScore is int hs && m.AwayScore is int aws && hs == aws;
+
+        <div class="ko-match @(m.Winner is not null ? "decided" : "")">
+            <div class="ko-head">
+                <span>Match @m.Fixture.MatchNumber</span>
+                @if (m.Winner is not null)
+                {
+                    <button class="btn-link-sm" @onclick="() => Tournament.ClearKnockoutAsync(id)">clear</button>
+                }
+            </div>
+
+            @RenderSlot(m, m.Home, true)
+            @RenderSlot(m, m.Away, false)
+
+            @if (known && drawScores && m.Winner is not null)
+            {
+                <label class="penalty-row">
+                    <input type="checkbox" checked="@m.DecidedByPenalties"
+                           @onchange="e => OnPenalty(m, e.Value)" />
+                    Decided on penalties
+                </label>
+            }
+        </div>
+    };
+
+    private RenderFragment RenderSlot(ResolvedKnockoutMatch m, ResolvedSlot slot, bool isHome) => __builder =>
+    {
+        var id = m.Fixture.MatchId;
+        var isWinner = slot.Team is not null && m.WinnerTeamId == slot.Team.Id;
+        var score = isHome ? m.HomeScore : m.AwayScore;
+
+        <div class="ko-slot @(isWinner ? "winner" : "")">
+            @if (slot.Team is not null)
+            {
+                <button class="ko-team" @onclick="() => Tournament.SetKnockoutWinnerAsync(id, slot.Team.Id)">
+                    <span class="ko-flag"><Flag Code="@slot.Team.Code" /></span>
+                    <span class="ko-name">@slot.Team.Name</span>
+                </button>
+                <input type="number" min="0" class="score" value="@score"
+                       @onchange="e => OnKoScore(m, e.Value, isHome)" />
+            }
+            else
+            {
+                <span class="ko-team placeholder">
+                    <span class="ko-name">@slot.Label</span>
+                </span>
+                <input type="number" class="score" disabled />
+            }
+        </div>
+    };
+
+    private async Task OnKoScore(ResolvedKnockoutMatch m, object? value, bool isHome)
+    {
+        await Tournament.SetKnockoutScoreSideAsync(m.Fixture.MatchId, ParseScore(value), isHome);
+    }
+
+    private async Task OnPenalty(ResolvedKnockoutMatch m, object? value)
+    {
+        var on = value is bool b && b;
+        await Tournament.SetKnockoutPenaltiesAsync(m.Fixture.MatchId, on);
+    }
+}

@@ -1,0 +1,109 @@
+@page "/groups"
+@inherits TournamentPage
+
+<PageTitle>Group Stage — World Cup 2026 Modeler</PageTitle>
+
+<div class="page-header">
+    <h1>Group Stage</h1>
+    <p class="lead">Enter scores to auto-rank each group, or use the arrows to manually set who finishes where. Top two of each group advance, plus the eight best third-placed teams.</p>
+</div>
+
+<div class="groups-grid">
+    @foreach (var group in Tournament.Groups)
+    {
+        var standings = Tournament.GetStandings(group);
+        <div class="group-card">
+            <div class="group-card-head">
+                <h2>Group @group</h2>
+                @if (Tournament.HasOverride(group))
+                {
+                    <button class="btn-link-sm" @onclick="() => Tournament.ClearOverrideAsync(group)">↺ auto-rank</button>
+                }
+            </div>
+
+            <table class="standings">
+                <thead>
+                    <tr>
+                        <th></th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
+                        <th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in standings)
+                    {
+                        <tr class="@PositionClass(s.Position)">
+                            <td class="pos">@s.Position</td>
+                            <td class="team-cell"><Flag Code="@s.Team.Code" /> @s.Team.Name</td>
+                            <td>@s.Played</td><td>@s.Won</td><td>@s.Drawn</td><td>@s.Lost</td>
+                            <td>@s.GoalsFor</td><td>@s.GoalsAgainst</td>
+                            <td>@(s.GoalDifference > 0 ? "+" : "")@s.GoalDifference</td>
+                            <td class="pts">@s.Points</td>
+                            <td class="reorder">
+                                <button class="arrow" disabled="@(s.Position == 1)"
+                                        @onclick="() => Tournament.MoveTeamAsync(group, s.Team.Id, -1)">▲</button>
+                                <button class="arrow" disabled="@(s.Position == standings.Count)"
+                                        @onclick="() => Tournament.MoveTeamAsync(group, s.Team.Id, 1)">▼</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="fixtures">
+                @foreach (var fx in Tournament.GroupFixtures(group))
+                {
+                    var home = Teams2026.ById[fx.HomeTeamId];
+                    var away = Teams2026.ById[fx.AwayTeamId];
+                    var score = Tournament.GetGroupScore(fx.MatchId);
+                    <div class="fixture">
+                        <span class="fx-home"><Flag Code="@home.Code" /> @home.Name</span>
+                        <input type="number" min="0" class="score" value="@score.HomeScore"
+                               @onchange="e => OnScore(fx.MatchId, e.Value, true)" />
+                        <span class="fx-dash">–</span>
+                        <input type="number" min="0" class="score" value="@score.AwayScore"
+                               @onchange="e => OnScore(fx.MatchId, e.Value, false)" />
+                        <span class="fx-away">@away.Name <Flag Code="@away.Code" /></span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div class="third-place-section">
+    <h2>Third-placed teams</h2>
+    <p>The top eight third-placed teams advance to the Round of 32.</p>
+    <table class="standings third-table">
+        <thead>
+            <tr><th>Rank</th><th>Group</th><th>Team</th><th>Pts</th><th>GD</th><th>GF</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Tournament.GetThirdPlaceRanking())
+            {
+                <tr class="@(e.Qualified ? "advance" : "eliminated")">
+                    <td>@e.Rank</td>
+                    <td>@e.Group</td>
+                    <td class="team-cell"><Flag Code="@e.Standing.Team.Code" /> @e.Standing.Team.Name</td>
+                    <td class="pts">@e.Standing.Points</td>
+                    <td>@(e.Standing.GoalDifference > 0 ? "+" : "")@e.Standing.GoalDifference</td>
+                    <td>@e.Standing.GoalsFor</td>
+                    <td>@(e.Qualified ? "Advances ✓" : "Out")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private static string PositionClass(int position) => position switch
+    {
+        1 or 2 => "advance",
+        3 => "maybe",
+        _ => "eliminated"
+    };
+
+    private async Task OnScore(string matchId, object? value, bool isHome)
+    {
+        await Tournament.SetGroupScoreSideAsync(matchId, ParseScore(value), isHome);
+    }
+}
