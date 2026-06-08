@@ -193,6 +193,16 @@ input.score:disabled { background: #f1f2f6; }
 .third-table { max-width: 640px; }
 .third-table td.team-cell, .third-table th { text-align: left; }
 
+/* ---------- Match date / venue line ---------- */
+.fixture-block { margin-bottom: .5rem; }
+.match-when-row {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .5rem;
+    font-size: .7rem; color: #6b7488; margin-bottom: .15rem;
+}
+.match-when { font-weight: 700; color: var(--wc-primary); white-space: nowrap; }
+.match-venue { color: #8a93a6; }
+.ko-match .match-when-row { margin-bottom: .3rem; }
+
 /* ---------- Bracket ---------- */
 .bracket-scroll { overflow-x: auto; padding-bottom: 1rem; }
 .bracket { display: flex; gap: 1.1rem; min-width: max-content; align-items: flex-start; }

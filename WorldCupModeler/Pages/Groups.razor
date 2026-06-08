@@ -1,5 +1,6 @@
 @page "/groups"
 @inherits TournamentPage
+@inject IJSRuntime JS
 
 <PageTitle>Group Stage — World Cup 2026 Modeler</PageTitle>
 
@@ -55,14 +56,17 @@
                     var home = Teams2026.ById[fx.HomeTeamId];
                     var away = Teams2026.ById[fx.AwayTeamId];
                     var score = Tournament.GetGroupScore(fx.MatchId);
-                    <div class="fixture">
-                        <span class="fx-home"><Flag Code="@home.Code" /> @home.Name</span>
-                        <input type="number" min="0" class="score" value="@score.HomeScore"
-                               @onchange="e => OnScore(fx.MatchId, e.Value, true)" />
-                        <span class="fx-dash">–</span>
-                        <input type="number" min="0" class="score" value="@score.AwayScore"
-                               @onchange="e => OnScore(fx.MatchId, e.Value, false)" />
-                        <span class="fx-away">@away.Name <Flag Code="@away.Code" /></span>
+                    <div class="fixture-block">
+                        <MatchTime Info="@Schedule2026.Get(fx.MatchId)" />
+                        <div class="fixture">
+                            <span class="fx-home"><Flag Code="@home.Code" /> @home.Name</span>
+                            <input type="number" min="0" class="score" value="@score.HomeScore"
+                                   @onchange="e => OnScore(fx.MatchId, e.Value, true)" />
+                            <span class="fx-dash">–</span>
+                            <input type="number" min="0" class="score" value="@score.AwayScore"
+                                   @onchange="e => OnScore(fx.MatchId, e.Value, false)" />
+                            <span class="fx-away">@away.Name <Flag Code="@away.Code" /></span>
+                        </div>
                     </div>
                 }
             </div>
@@ -105,5 +109,10 @@
     private async Task OnScore(string matchId, object? value, bool isHome)
     {
         await Tournament.SetGroupScoreSideAsync(matchId, ParseScore(value), isHome);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JS.InvokeVoidAsync("worldCupSchedule.formatLocalTimes");
     }
 }
