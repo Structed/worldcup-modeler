@@ -36,6 +36,23 @@ dotnet publish WorldCupModeler -c Release
 The static site is emitted to `WorldCupModeler/bin/Release/net10.0/publish/wwwroot`
 and can be hosted on any static host (GitHub Pages, Azure Static Web Apps, etc.).
 
+## Deployment (GitHub Pages)
+
+The app is deployed to **GitHub Pages** automatically. The workflow
+[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) runs on every
+push to `main` (i.e. when a pull request is merged) and:
+
+1. publishes the Blazor WebAssembly app,
+2. rewrites `<base href>` to `/worldcup-modeler/` (the project-site path),
+3. adds a `404.html` SPA fallback and a `.nojekyll` marker, then
+4. deploys the output via the official GitHub Pages actions.
+
+The site is served at <https://structed.github.io/worldcup-modeler/>.
+
+**One-time setup:** in the repository, go to **Settings → Pages → Build and deployment**
+and set **Source** to **GitHub Actions**. This only needs to be done once and cannot be
+configured from the repo itself.
+
 ## Notes
 
 - Real flag images are bundled locally via the [`flag-icons`](https://github.com/lipis/flag-icons)
