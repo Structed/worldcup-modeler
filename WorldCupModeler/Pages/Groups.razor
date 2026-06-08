@@ -24,8 +24,8 @@
             <table class="standings">
                 <thead>
                     <tr>
-                        <th></th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
-                        <th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th></th>
+                        <th></th><th>Team</th><th title="Played">P</th><th title="Won">W</th><th title="Drawn">D</th><th title="Lost">L</th>
+                        <th title="Goals For">GF</th><th title="Goals Against">GA</th><th title="Goal Difference">GD</th><th title="Points">Pts</th><th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -75,7 +75,7 @@
     <p>The top eight third-placed teams advance to the Round of 32.</p>
     <table class="standings third-table">
         <thead>
-            <tr><th>Rank</th><th>Group</th><th>Team</th><th>Pts</th><th>GD</th><th>GF</th><th>Status</th></tr>
+            <tr><th>Rank</th><th>Group</th><th>Team</th><th title="Points">Pts</th><th title="Goal Difference">GD</th><th title="Goals For">GF</th><th>Status</th></tr>
         </thead>
         <tbody>
             @foreach (var e in Tournament.GetThirdPlaceRanking())
