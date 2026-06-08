@@ -1,0 +1,54 @@
+@page "/about"
+
+<PageTitle>About — World Cup 2026 Modeler</PageTitle>
+
+<div class="page-header">
+    <h1>About World Cup 2026 Modeler</h1>
+    <p class="lead">
+        This is a static Blazor WebAssembly app for simulating the FIFA World Cup 2026 tournament from group stage to final.
+    </p>
+</div>
+
+<div class="home-cards">
+    <section class="home-card">
+        <h2>What this app does</h2>
+        <p>
+            Enter group-stage scores or manually reorder teams, then choose winners in every knockout match and watch the full bracket update automatically.
+        </p>
+    </section>
+
+    <section class="home-card">
+        <h2>How data is stored</h2>
+        <p>
+            Your model is saved locally in your browser using <code>localStorage</code>. There is no backend service and no sign-in required.
+        </p>
+    </section>
+
+    <section class="home-card">
+        <h2>Ranking and bracket rules</h2>
+        <p>
+            Group standings use points, then goal difference, then goals for. The best eight third-placed teams are assigned to Round-of-32 slots with a deterministic rule that avoids same-group rematches.
+        </p>
+    </section>
+    <section class="home-card">
+        <h2>Project</h2>
+        <p>
+            World Cup 2026 Modeler is open source and published as a static site on GitHub Pages.
+        </p>
+    </section>
+
+    <section class="home-card">
+        <h2>Creator</h2>
+        <p>
+            Built by Johannes Ebner.
+        </p>
+        <p>
+            <a href="https://github.com/Structed" target="_blank" rel="noopener noreferrer">GitHub: @@Structed</a><br />
+            <a href="https://github.com/Structed/worldcup-modeler" target="_blank" rel="noopener noreferrer">Source repository</a>
+        </p>
+    </section>
+</div>
+
+<p class="footnote">
+    Tip: use the Reset everything button on the Home page whenever you want to clear your current simulation and start over.
+</p>
