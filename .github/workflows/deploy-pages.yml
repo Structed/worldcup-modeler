@@ -1,0 +1,65 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish
+        run: dotnet publish WorldCupModeler -c Release -o publish
+
+      - name: Prepare wwwroot for GitHub Pages
+        shell: pwsh
+        run: |
+          $wwwroot = "publish/wwwroot"
+          $indexPath = Join-Path $wwwroot "index.html"
+
+          # Rewrite the base href for project-site hosting (https://<owner>.github.io/<repo>/).
+          $basePath = "/${{ github.event.repository.name }}/"
+          $html = Get-Content $indexPath -Raw
+          $html = $html -replace '<base href="/" />', "<base href=""$basePath"" />"
+          Set-Content $indexPath $html -NoNewline
+          Write-Host "Set <base href> to $basePath"
+
+          # SPA fallback so client-side routes resolve on deep-link/refresh.
+          Copy-Item $indexPath (Join-Path $wwwroot "404.html") -Force
+
+          # Stop GitHub Pages' Jekyll from ignoring the _framework folder.
+          New-Item -ItemType File -Path (Join-Path $wwwroot ".nojekyll") -Force | Out-Null
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish/wwwroot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
