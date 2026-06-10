@@ -1,34 +1,31 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">🏆 WC 2026 Modeler</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿<div class="header-inner">
+    <a class="brand" href="">
+        <span class="brand-trophy" aria-hidden="true">🏆</span>
+        <span class="brand-text">
+            <span class="brand-title">World Cup <span class="brand-year">2026</span></span>
+            <span class="brand-sub">Modeler</span>
+        </span>
+    </a>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="groups">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Group Stage
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="bracket">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Knockout Bracket
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="about">
-                <span class="bi bi-info-circle-fill-nav-menu" aria-hidden="true"></span> About
-            </NavLink>
-        </div>
+    <button title="Navigation menu" class="nav-toggler" @onclick="ToggleNavMenu" aria-label="Toggle navigation">
+        <span class="nav-toggler-bar"></span>
+        <span class="nav-toggler-bar"></span>
+        <span class="nav-toggler-bar"></span>
+    </button>
+
+    <nav class="@NavMenuCssClass main-nav" @onclick="CollapseNavMenu">
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+        </NavLink>
+        <NavLink class="nav-link" href="groups">
+            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Group Stage
+        </NavLink>
+        <NavLink class="nav-link" href="bracket">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Knockout Bracket
+        </NavLink>
+        <NavLink class="nav-link" href="about">
+            <span class="bi bi-info-circle-fill-nav-menu" aria-hidden="true"></span> About
+        </NavLink>
     </nav>
 </div>
 
@@ -40,5 +37,10 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void CollapseNavMenu()
+    {
+        collapseNavMenu = true;
     }
 }
