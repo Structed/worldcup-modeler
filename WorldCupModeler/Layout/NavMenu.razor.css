@@ -1,22 +1,124 @@
-.navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.1);
+.header-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    height: var(--wc-header-h);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem;
 }
 
-.top-row {
-    min-height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
+@media (min-width: 641px) {
+    .header-inner {
+        padding: 0 2rem;
+    }
 }
 
-.navbar-brand {
-    font-size: 1.1rem;
+/* ---------- Brand ---------- */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    text-decoration: none;
+    color: #fff;
+    margin-right: auto;
 }
 
+.brand-trophy {
+    font-size: 1.6rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .35));
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+}
+
+.brand-title {
+    font-family: var(--wc-font-display);
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: .2px;
+    color: #fff;
+}
+
+.brand-year {
+    background: linear-gradient(90deg, var(--wc-gold), #ffe08a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.brand-sub {
+    font-size: .68rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .6);
+}
+
+/* ---------- Navigation ---------- */
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.main-nav ::deep a {
+    display: inline-flex;
+    align-items: center;
+    color: rgba(255, 255, 255, .78);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: .92rem;
+    padding: .5rem .85rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    transition: color .15s ease, background-color .15s ease;
+}
+
+.main-nav ::deep a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, .08);
+}
+
+.main-nav ::deep a.active {
+    color: #fff;
+    background: rgba(255, 255, 255, .12);
+    box-shadow: inset 0 -2px 0 0 var(--wc-gold);
+}
+
+/* ---------- Hamburger ---------- */
+.nav-toggler {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 42px;
+    height: 38px;
+    padding: 0 9px;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.nav-toggler-bar {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: #fff;
+    border-radius: 2px;
+}
+
+/* ---------- Nav icons (white SVGs) ---------- */
 .bi {
     display: inline-block;
     position: relative;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.75rem;
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-right: 0.4rem;
     top: -1px;
     background-size: cover;
 }
@@ -37,51 +139,37 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-info-circle-fill' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.93 4.412a.5.5 0 0 0-.97.176v.03l.118 3.236a.5.5 0 0 0 .998 0l.118-3.236v-.03a.5.5 0 0 0-.264-.44zM8 10.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5z'/%3E%3C/svg%3E");
 }
 
-.nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
-}
-
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-    }
-
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
-    }
-
-    .nav-item ::deep a {
-        color: #d7d7d7;
-        border-radius: 4px;
-        height: 3rem;
+/* ---------- Mobile ---------- */
+@media (max-width: 640.98px) {
+    .nav-toggler {
         display: flex;
-        align-items: center;
-        line-height: 3rem;
     }
 
-.nav-item ::deep a.active {
-    background-color: rgba(255,255,255,0.37);
-    color: white;
-}
+    .main-nav {
+        position: absolute;
+        top: var(--wc-header-h);
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: .5rem;
+        background: var(--wc-navy-800);
+        border-bottom: 1px solid rgba(255, 255, 255, .08);
+        box-shadow: 0 12px 24px rgba(5, 13, 34, .45);
+    }
 
-.nav-item ::deep a:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-}
-
-@media (min-width: 641px) {
-    .navbar-toggler {
+    .main-nav.collapse {
         display: none;
     }
 
-    .collapse {
-        /* Never collapse the sidebar for wide screens */
-        display: block;
+    .main-nav ::deep a {
+        font-size: 1rem;
+        padding: .8rem 1rem;
+        border-radius: 8px;
     }
 
-    .nav-scrollable {
-        /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
-        overflow-y: auto;
+    .main-nav ::deep a.active {
+        box-shadow: inset 3px 0 0 0 var(--wc-gold);
     }
 }

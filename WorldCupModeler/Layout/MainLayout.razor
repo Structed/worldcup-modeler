@@ -1,16 +1,20 @@
 ﻿@inherits LayoutComponentBase
 <div class="page">
-    <div class="sidebar">
+    <header class="app-header">
         <NavMenu />
-    </div>
+    </header>
 
     <main>
-        <div class="top-row px-4">
-            <a href="about">About</a>
-        </div>
-
         <article class="content px-4">
             @Body
         </article>
+
+        <footer class="app-footer px-4">
+            <span class="footer-mark">🏆 World Cup 2026 Modeler</span>
+            <span class="footer-sep">·</span>
+            <a href="about">About</a>
+            <span class="footer-sep">·</span>
+            <a href="https://github.com/Structed/worldcup-modeler" target="_blank" rel="noopener noreferrer">Source</a>
+        </footer>
     </main>
 </div>
