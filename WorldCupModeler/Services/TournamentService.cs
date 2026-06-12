@@ -78,6 +78,10 @@ public class TournamentService(LocalStorageService storage)
     public MatchScore GetGroupScore(string matchId) =>
         _state.GroupResults.TryGetValue(matchId, out var s) ? s : new MatchScore();
 
+    /// <summary>True when this group match's score is a fixed real-world result, not a prediction.</summary>
+    public bool IsOfficialGroupResult(string matchId) =>
+        Results2026.GroupResults.ContainsKey(matchId);
+
     public async Task SetGroupScoreAsync(string matchId, int? home, int? away)
     {
         if (home is null && away is null)
@@ -348,6 +352,10 @@ public class TournamentService(LocalStorageService storage)
 
     public Team? Champion =>
         GetKnockoutMatches().FirstOrDefault(m => m.Fixture.Round == KnockoutRound.Final)?.Winner;
+
+    /// <summary>True when this knockout match's result is a fixed real-world result, not a prediction.</summary>
+    public bool IsOfficialKnockoutResult(string matchId) =>
+        Results2026.KnockoutResults.ContainsKey(matchId);
 
     // ----- Reset -----------------------------------------------------------
 

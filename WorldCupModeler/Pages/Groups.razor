@@ -56,17 +56,24 @@
                     var home = Teams2026.ById[fx.HomeTeamId];
                     var away = Teams2026.ById[fx.AwayTeamId];
                     var score = Tournament.GetGroupScore(fx.MatchId);
-                    <div class="fixture-block">
+                    var official = Tournament.IsOfficialGroupResult(fx.MatchId);
+                    <div class="fixture-block @(official ? "official" : "")">
                         <MatchTime Info="@Schedule2026.Get(fx.MatchId)" />
                         <div class="fixture">
                             <span class="fx-home"><Flag Code="@home.Code" /> @home.Name</span>
                             <input type="number" min="0" class="score" value="@score.HomeScore"
+                                   disabled="@official" title="@(official ? "Official result" : null)"
                                    @onchange="e => OnScore(fx.MatchId, e.Value, true)" />
                             <span class="fx-dash">–</span>
                             <input type="number" min="0" class="score" value="@score.AwayScore"
+                                   disabled="@official" title="@(official ? "Official result" : null)"
                                    @onchange="e => OnScore(fx.MatchId, e.Value, false)" />
                             <span class="fx-away">@away.Name <Flag Code="@away.Code" /></span>
                         </div>
+                        @if (official)
+                        {
+                            <div class="official-tag" title="Final real-world result — not editable">✓ Official result</div>
+                        }
                     </div>
                 }
             </div>
