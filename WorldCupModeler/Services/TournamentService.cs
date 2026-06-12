@@ -26,6 +26,43 @@ public class TournamentService(LocalStorageService storage)
         _loaded = true;
         var saved = await storage.GetAsync<TournamentState>(StorageKey);
         if (saved is not null) _state = saved;
+        ApplyOfficialResults();
+    }
+
+    /// <summary>
+    /// Overlays the known real-world results (<see cref="Results2026"/>) onto the current
+    /// state so that already-played matches always show their official scoreline, while
+    /// every other match stays whatever the user predicted. Applied in memory on each load
+    /// (and after a reset); it is not persisted on its own — a real result outranks a guess.
+    /// </summary>
+    private void ApplyOfficialResults()
+    {
+        foreach (var (matchId, score) in Results2026.GroupResults)
+        {
+            _state.GroupResults[matchId] = new MatchScore
+            {
+                HomeScore = score.HomeScore,
+                AwayScore = score.AwayScore,
+            };
+        }
+
+        if (Results2026.KnockoutResults.Count == 0) return;
+
+        // Knockout pairings depend on the (now-seeded) group results, so resolve them first.
+        var resolved = GetKnockoutMatches().ToDictionary(m => m.Fixture.MatchId);
+        foreach (var (matchId, official) in Results2026.KnockoutResults)
+        {
+            if (!resolved.TryGetValue(matchId, out var m)) continue;
+            _state.KnockoutResults[matchId] = new KnockoutResultState
+            {
+                WinnerTeamId = official.WinnerTeamId,
+                HomeScore = official.HomeScore,
+                AwayScore = official.AwayScore,
+                DecidedByPenalties = official.DecidedByPenalties,
+                HomeTeamId = m.Home.Team?.Id,
+                AwayTeamId = m.Away.Team?.Id,
+            };
+        }
     }
 
     private async Task PersistAsync()
@@ -318,6 +355,7 @@ public class TournamentService(LocalStorageService storage)
     {
         _state = new TournamentState();
         await storage.RemoveAsync(StorageKey);
+        ApplyOfficialResults();
         OnChange?.Invoke();
     }
 }
