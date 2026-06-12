@@ -270,6 +270,21 @@ input.score {
 }
 input.score:disabled { background: #f1f2f6; }
 
+.fixture-block.official input.score:disabled {
+    background: #e8f6ee;
+    border-color: #46b475;
+    color: #1f7a44;
+    cursor: not-allowed;
+}
+.official-tag {
+    margin-top: .15rem;
+    font-size: .66rem;
+    font-weight: 700;
+    color: #1f7a44;
+    text-align: center;
+    letter-spacing: .02em;
+}
+
 .third-place-section { margin-top: 2rem; }
 .third-table { max-width: 640px; }
 .third-table td.team-cell, .third-table th { text-align: left; }

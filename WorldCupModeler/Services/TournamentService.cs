@@ -26,6 +26,43 @@ public class TournamentService(LocalStorageService storage)
         _loaded = true;
         var saved = await storage.GetAsync<TournamentState>(StorageKey);
         if (saved is not null) _state = saved;
+        ApplyOfficialResults();
+    }
+
+    /// <summary>
+    /// Overlays the known real-world results (<see cref="Results2026"/>) onto the current
+    /// state so that already-played matches always show their official scoreline, while
+    /// every other match stays whatever the user predicted. Applied in memory on each load
+    /// (and after a reset); it is not persisted on its own — a real result outranks a guess.
+    /// </summary>
+    private void ApplyOfficialResults()
+    {
+        foreach (var (matchId, score) in Results2026.GroupResults)
+        {
+            _state.GroupResults[matchId] = new MatchScore
+            {
+                HomeScore = score.HomeScore,
+                AwayScore = score.AwayScore,
+            };
+        }
+
+        if (Results2026.KnockoutResults.Count == 0) return;
+
+        // Knockout pairings depend on the (now-seeded) group results, so resolve them first.
+        var resolved = GetKnockoutMatches().ToDictionary(m => m.Fixture.MatchId);
+        foreach (var (matchId, official) in Results2026.KnockoutResults)
+        {
+            if (!resolved.TryGetValue(matchId, out var m)) continue;
+            _state.KnockoutResults[matchId] = new KnockoutResultState
+            {
+                WinnerTeamId = official.WinnerTeamId,
+                HomeScore = official.HomeScore,
+                AwayScore = official.AwayScore,
+                DecidedByPenalties = official.DecidedByPenalties,
+                HomeTeamId = m.Home.Team?.Id,
+                AwayTeamId = m.Away.Team?.Id,
+            };
+        }
     }
 
     private async Task PersistAsync()
@@ -40,6 +77,10 @@ public class TournamentService(LocalStorageService storage)
 
     public MatchScore GetGroupScore(string matchId) =>
         _state.GroupResults.TryGetValue(matchId, out var s) ? s : new MatchScore();
+
+    /// <summary>True when this group match's score is a fixed real-world result, not a prediction.</summary>
+    public bool IsOfficialGroupResult(string matchId) =>
+        Results2026.GroupResults.ContainsKey(matchId);
 
     public async Task SetGroupScoreAsync(string matchId, int? home, int? away)
     {
@@ -312,12 +353,17 @@ public class TournamentService(LocalStorageService storage)
     public Team? Champion =>
         GetKnockoutMatches().FirstOrDefault(m => m.Fixture.Round == KnockoutRound.Final)?.Winner;
 
+    /// <summary>True when this knockout match's result is a fixed real-world result, not a prediction.</summary>
+    public bool IsOfficialKnockoutResult(string matchId) =>
+        Results2026.KnockoutResults.ContainsKey(matchId);
+
     // ----- Reset -----------------------------------------------------------
 
     public async Task ResetAllAsync()
     {
         _state = new TournamentState();
         await storage.RemoveAsync(StorageKey);
+        ApplyOfficialResults();
         OnChange?.Invoke();
     }
 }

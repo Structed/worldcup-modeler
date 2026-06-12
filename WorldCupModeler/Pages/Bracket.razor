@@ -134,15 +134,18 @@
         var id = m.Fixture.MatchId;
         var isWinner = slot.Team is not null && m.WinnerTeamId == slot.Team.Id;
         var score = isHome ? m.HomeScore : m.AwayScore;
+        var official = Tournament.IsOfficialKnockoutResult(id);
 
         <div class="ko-slot @(isWinner ? "winner" : "")">
             @if (slot.Team is not null)
             {
-                <button class="ko-team" @onclick="() => Tournament.SetKnockoutWinnerAsync(id, slot.Team.Id)">
+                <button class="ko-team" disabled="@official"
+                        @onclick="() => Tournament.SetKnockoutWinnerAsync(id, slot.Team.Id)">
                     <span class="ko-flag"><Flag Code="@slot.Team.Code" /></span>
                     <span class="ko-name">@slot.Team.Name</span>
                 </button>
                 <input type="number" min="0" class="score" value="@score"
+                       disabled="@official" title="@(official ? "Official result" : null)"
                        @onchange="e => OnKoScore(m, e.Value, isHome)" />
             }
             else

@@ -14,6 +14,10 @@ saved in your browser's `localStorage`; there is no backend.
   third-place play-off. Winner-first: click the team you think advances; scores are
   optional, with a penalty-shootout toggle for draws.
 - Editing an earlier result **cascades** downstream and clears now-invalid picks.
+- **Real results are pre-filled:** matches that have already been played in the actual
+  tournament are seeded from `WorldCupModeler/Data/Results2026.cs`, so the model starts
+  from reality. Those games always show their official scoreline; everything else is yours
+  to predict.
 - **Export the knockout bracket as a PNG** image (📷 button on the Bracket page).
 - **Reset everything** from the Home page.
 
@@ -63,3 +67,6 @@ configured from the repo itself.
   Annex C lookup table.
 - The team field and bracket structure live in `WorldCupModeler/Data/` and can be
   updated for a future edition.
+- Official results for matches already played live in `WorldCupModeler/Data/Results2026.cs`
+  and are overlaid on top of your saved model each time the app loads, so played games
+  always reflect the real scoreline. Update that file to add new results as they happen.
